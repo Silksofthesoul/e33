@@ -1,4 +1,5 @@
 import { Markov } from './markov.js';
+import { createI18n, errorKey } from './i18n.js';
 import { LocalStore, STORAGE_KEY, emptyState } from './storage.js';
 
 const source = document.querySelector('#source');
@@ -17,23 +18,32 @@ let draftTimer;
 let draftGeneration = 0;
 let queue = Promise.resolve();
 const enqueue = task => { const pending = queue.then(task); queue = pending.catch(() => {}); return pending; };
-const tell = (message, kind = 'info') => { status.textContent = message; status.dataset.kind = kind; };
-const memoryNotice = 'Хранилище недоступно: текст и модель работают только в этой вкладке и исчезнут после её закрытия.';
+let statusMessage = null;
+function renderStatus() {
+  if (!statusMessage) return;
+  status.textContent = i18n.text(statusMessage.key);
+  status.dataset.kind = statusMessage.kind;
+}
+const tell = (key, kind = 'info') => { statusMessage = { key, kind }; renderStatus(); };
+const memoryNotice = 'memoryOnly';
 
 function refresh() {
-  document.querySelector('#counter').textContent = `${source.value.length.toLocaleString('ru-RU')} / 50 000`;
+  document.querySelector('#counter').textContent = `${i18n.number(source.value.length)} / ${i18n.number(50000)}`;
   const size = Object.keys(state.model.chain).length;
-  document.querySelector('#model-info').textContent = size ? `Слов в модели: ${size.toLocaleString('ru-RU')}` : 'Модель пока пуста';
+  document.querySelector('#model-info').textContent = size ? i18n.text('modelWords', { count: i18n.number(size) }) : i18n.text('emptyModel');
   train.disabled = busy || invalid || !source.value.trim();
   generate.disabled = busy || invalid || !size;
   document.querySelector('#clear').disabled = busy;
 }
 
+const i18n = createI18n(window, document, () => { refresh(); renderStatus(); });
+i18n.start();
+
 try {
   state = store.read();
   source.value = state.draft;
-  tell(store.persistent ? (Object.keys(state.model.chain).length ? 'Ваша модель восстановлена. Можно продолжать.' : 'Начните со своего текста. Здесь пока только ваша пустая модель.') : memoryNotice, store.persistent ? 'info' : 'error');
-} catch (error) { invalid = true; tell(error.message, 'error'); }
+  tell(store.persistent ? (Object.keys(state.model.chain).length ? 'restored' : 'welcome') : memoryNotice, store.persistent ? 'info' : 'error');
+} catch (error) { invalid = true; tell(errorKey(error), 'error'); }
 refresh();
 
 // Lifecycle events cannot await a promise: flush the draft against the latest
@@ -42,7 +52,7 @@ function flushDraft() {
   if (invalid || busy) return;
   clearTimeout(draftTimer); draftGeneration++;
   try { state = store.saveDraftNow(source.value); }
-  catch (error) { tell(error.message, 'error'); }
+  catch (error) { tell(errorKey(error), 'error'); }
 }
 window.addEventListener('pagehide', flushDraft);
 document.addEventListener('visibilitychange', () => { if (document.hidden) flushDraft(); });
@@ -58,9 +68,9 @@ source.addEventListener('input', () => {
     if (version !== draftGeneration) return;
     try {
       state = await store.update(current => ({ ...current, draft }));
-      tell(store.persistent ? 'Текст сохранён в этом браузере.' : memoryNotice, store.persistent ? 'info' : 'error');
+      tell(store.persistent ? 'draftSaved' : memoryNotice, store.persistent ? 'info' : 'error');
       refresh();
-    } catch (error) { tell(error.message, 'error'); }
+    } catch (error) { tell(errorKey(error), 'error'); }
   }), 200);
 });
 
@@ -68,7 +78,7 @@ document.querySelector('#training-form').addEventListener('submit', event => {
   event.preventDefault();
   if (busy || invalid) return;
   const text = source.value;
-  if (!text.trim() || text.length > 50000) return tell('Введите текст до 50 000 символов.', 'error');
+  if (!text.trim() || text.length > 50000) return tell('inputLimit', 'error');
   clearTimeout(draftTimer);
   draftGeneration++;
   busy = true; refresh();
@@ -80,8 +90,8 @@ document.querySelector('#training-form').addEventListener('submit', event => {
         return { ...current, draft: text, model: model.snapshot() };
       });
       result.value = new Markov(state.model).generate('Привет,', 64);
-      tell(store.persistent ? 'Готово. Текст и модель сохранены в вашем браузере.' : memoryNotice, store.persistent ? 'info' : 'error');
-    } catch (error) { tell(error.message, 'error'); }
+      tell(store.persistent ? 'trained' : memoryNotice, store.persistent ? 'info' : 'error');
+    } catch (error) { tell(errorKey(error), 'error'); }
     finally { busy = false; refresh(); }
   });
 });
@@ -90,9 +100,9 @@ generate.addEventListener('click', () => {
   try {
     state = store.read();
     result.value = new Markov(state.model).generate('Привет,', 64);
-    tell(store.persistent ? 'Новый вариант из вашей модели.' : memoryNotice, store.persistent ? 'info' : 'error');
+    tell(store.persistent ? 'generated' : memoryNotice, store.persistent ? 'info' : 'error');
     refresh();
-  } catch (error) { tell(error.message, 'error'); }
+  } catch (error) { tell(errorKey(error), 'error'); }
 });
 
 document.querySelector('#clear').addEventListener('click', () => dialog.showModal());
@@ -104,9 +114,9 @@ document.querySelector('#confirm-clear').addEventListener('click', () => {
     try {
       state = await store.clear();
       invalid = false; source.value = ''; result.value = '';
-      tell('Данные Mimi Markov очищены. Другие данные сайта не затронуты.');
+      tell('cleared');
       dialog.close(); source.focus();
-    } catch (error) { tell(error.message, 'error'); dialog.close(); }
+    } catch (error) { tell(errorKey(error), 'error'); dialog.close(); }
     finally { busy = false; refresh(); }
   });
 });
@@ -119,11 +129,11 @@ window.addEventListener('storage', event => {
     state = store.read(); result.value = '';
     if (event.newValue === null) {
       source.value = ''; invalid = false;
-      tell('Данные Mimi Markov очищены в другой вкладке.');
+      tell('clearedElsewhere');
       refresh(); return;
     }
     // Keep this tab's unsent text; never silently replace the user's draft.
-    tell('Модель изменилась в другой вкладке. Ваш текст в поле оставлен без изменений.');
+    tell('changedElsewhere');
     invalid = false; refresh();
-  } catch (error) { invalid = true; tell(error.message, 'error'); refresh(); }
+  } catch (error) { invalid = true; tell(errorKey(error), 'error'); refresh(); }
 });

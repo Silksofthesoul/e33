@@ -7,6 +7,8 @@
     "assets/sha1.js",
     "assets/storage.js",
     "assets/style.css",
-    "assets/icon.svg"
+    "assets/icon.svg",
+    "assets/messages.js",
+    "assets/i18n.js"
   ]
 }
