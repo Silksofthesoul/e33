@@ -16,7 +16,7 @@
     <header class="page-header">
       <div class="identity"><span class="mark" aria-hidden="true">m<span>m</span></span><span>E33 · Silksofthesoul</span></div>
       <h1>Mimi Markov<span aria-hidden="true">.</span></h1>
-      <p class="intro"><span data-i18n="introLead">Дайте словам немного свободы.</span><br><span data-i18n="introBody">Введите текст — и посмотрите, какие связи он оставит.</span></p>
+      <p class="intro"><span data-i18n="introLead">Генерация текста.</span><br><span data-i18n="introBody">Введите текст — и посмотрите, какие связи он оставит.</span></p>
       <p class="privacy"><span aria-hidden="true">●</span> <span data-i18n="privacy">Обработка в браузере · данные сохраняются на этом устройстве</span></p>
     </header>
 
@@ -41,7 +41,7 @@
       <p><span data-i18n="storageBefore">Текст в поле и обученная модель сохраняются в </span><code>localStorage</code><span data-i18n="storageAfter"> этого браузера. На сервер они не отправляются. Очистка данных сайта удалит их.</span></p>
       <button data-i18n="clear" id="clear" type="button" class="quiet">Очистить мои данные</button>
     </footer>
-    <details class="about"><summary data-i18n="about">Как это работает</summary><p data-i18n="algorithm">Авторский алгоритм цепей Маркова первого порядка: слова запоминают соседей, а следующий шаг выбирается с учётом частоты переходов. Один и тот же текст не обучает модель дважды. Генератор не понимает смысл — в этом и состоит эксперимент.</p><p data-i18n="storageAbout">Хранилище относится к адресу сайта и профилю браузера. Другой браузер начнёт с пустой модели. Другие приложения на том же адресе сайта технически могут читать его localStorage; не используйте конфиденциальные тексты.</p></details>
+    <details class="about"><summary data-i18n="about">Как это работает</summary><p data-i18n="algorithm">Простая реализация алгоритма цепей Маркова первого порядка: слова запоминают соседей, а следующий шаг выбирается с учётом частоты переходов. Один и тот же текст не обучает модель дважды. Генератор не понимает смысл — в этом и состоит эксперимент.</p><p data-i18n="storageAbout">Хранилище относится к адресу сайта и профилю браузера. Другой браузер начнёт с пустой модели. Другие приложения на том же адресе сайта технически могут читать его localStorage; не используйте конфиденциальные тексты.</p></details>
     <noscript><p class="status">Для эксперимента нужен JavaScript. Серверной обработки здесь нет.</p></noscript>
   </main>
   <dialog id="clear-dialog" aria-labelledby="clear-title">
