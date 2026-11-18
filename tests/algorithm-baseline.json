@@ -1,0 +1,10 @@
+{
+  "sourceRevision": "4cc51b2b9aa7eb5dfb7fdb2dc89d45bc60070c36",
+  "methods": {
+    "parse": "ad02754657c79e5985071870b7bd6aa75f737ebc9f3b0d5d3e259e48c33e8453",
+    "setChainEnd": "658ebe4219c97b58cba0d0acba4f143b05a3a49429096150e7bffeed20aa956c",
+    "setChainItem": "1ac66ffdc4f713f3300dd3dceceec9c144c3322ac63a868ba9e790f0e56d48d1",
+    "setCurrentChain": "d4b738180662cb84f9410e5faa99ff0527b05584dbc5c86e205583badf4dda42",
+    "generate": "b03875eb5560930f62da2c596d844a2f4be04cae37f087e2a5b9bd585b99a671"
+  }
+}

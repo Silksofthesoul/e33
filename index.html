@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Авторский эксперимент Silksofthesoul с цепями Маркова. Текст и обучение остаются в вашем браузере.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>E33 — Mimi Markov</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script type="module" src="./assets/app.js"></script>
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <div class="identity"><span class="mark" aria-hidden="true">m<span>m</span></span><span>E33 · Silksofthesoul</span></div>
+      <h1>Mimi Markov<span aria-hidden="true">.</span></h1>
+      <p class="intro">Дайте словам немного свободы.<br>Введите текст — и посмотрите, какие связи он оставит.</p>
+      <p class="privacy"><span aria-hidden="true">●</span> Обработка в браузере · данные сохраняются на этом устройстве</p>
+    </header>
+
+    <div class="workspace">
+      <form id="training-form" class="panel">
+        <div class="panel-heading"><label for="source">Исходный текст</label><span class="step" aria-hidden="true">01</span></div>
+        <p id="source-help" class="hint">Добавьте несколько предложений. Каждый новый текст дополняет вашу модель.</p>
+        <textarea id="source" name="text" maxlength="50000" rows="10" placeholder="Всё начинается со слова…" aria-describedby="source-help" spellcheck="true"></textarea>
+        <div class="panel-footer"><span id="counter" class="meta">0 / 50 000</span><button id="train" type="submit" class="primary">Обучить и создать <span aria-hidden="true">↗</span></button></div>
+      </form>
+
+      <section class="panel result-panel" aria-labelledby="result-label">
+        <div class="panel-heading"><label id="result-label" for="result">Новая последовательность</label><span class="step" aria-hidden="true">02</span></div>
+        <p class="hint">Те же слова, другие встречи. В результате — 65 слов.</p>
+        <textarea id="result" readonly rows="10" placeholder="Здесь появится новая последовательность слов." spellcheck="false"></textarea>
+        <div class="panel-footer"><span id="model-info" class="meta">Модель пока пуста</span><button id="generate" type="button" disabled>Ещё вариант <span aria-hidden="true">↻</span></button></div>
+      </section>
+    </div>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+    <footer class="page-footer">
+      <p>Текст в поле и обученная модель сохраняются в <code>localStorage</code> этого браузера. На сервер они не отправляются. Очистка данных сайта удалит их.</p>
+      <button id="clear" type="button" class="quiet">Очистить мои данные</button>
+    </footer>
+    <details class="about"><summary>Как это работает</summary><p>Авторский алгоритм цепей Маркова первого порядка: слова запоминают соседей, а следующий шаг выбирается с учётом частоты переходов. Один и тот же текст не обучает модель дважды. Генератор не понимает смысл — в этом и состоит эксперимент.</p><p>Хранилище относится к адресу сайта и профилю браузера. Другой браузер начнёт с пустой модели. Другие приложения на том же адресе сайта технически могут читать его localStorage; не используйте конфиденциальные тексты.</p></details>
+    <noscript><p class="status">Для эксперимента нужен JavaScript. Серверной обработки здесь нет.</p></noscript>
+  </main>
+  <dialog id="clear-dialog" aria-labelledby="clear-title">
+    <h2 id="clear-title">Очистить данные Mimi Markov?</h2>
+    <p>Будут удалены ваш текст и модель только этого эксперимента в этом браузере. Отменить очистку нельзя.</p>
+    <div class="dialog-actions"><button id="cancel-clear" type="button" autofocus>Оставить</button><button id="confirm-clear" type="button" class="danger">Очистить</button></div>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "kind": "static",
+  "files": [
+    "index.html",
+    "assets/app.js",
+    "assets/markov.js",
+    "assets/sha1.js",
+    "assets/storage.js",
+    "assets/style.css",
+    "assets/icon.svg"
+  ]
+}
